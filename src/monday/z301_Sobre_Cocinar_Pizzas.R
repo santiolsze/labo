@@ -24,9 +24,13 @@ require("DiceKriging")
 require("mlrMBO")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd("/home/santiago/Documents/Maestría/EyF/")
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(666607,
+              666637,
+              666647,
+              666667,
+              666697)
 
 # Cargamos el dataset
 dataset <- fread("./datasets/competencia1_2022.csv")
@@ -122,7 +126,7 @@ dist_uni <- matrix(runif(20), 10, 2)
 
 # LHS Latin hypercube sampling
 set.seed(semillas[1])
-dist_lhs <- optimumLHS(10, 2)
+dist_lhs <- optimumLHS(10, 2) #Hay muchas implementaciones de LHS, esta es una.
 
 par(mfrow = c(1, 2))
 plot(dist_uni)
@@ -196,6 +200,7 @@ print("Muestra train")
 print(t1 - t0)
 print(r2)
 
+
 ## Preguntas
 ## - ¿Por qué sólo se muestrea train?
 
@@ -218,6 +223,22 @@ experimento_rpart <- function(ds, semillas, cp = 0, ms = 20, mb = 1, md = 10) {
     auc <- c(auc, r)
   }
   mean(auc)
+}
+
+experimento_rpart_sin_muestreo <- function(ds, semillas, cp = 0, ms = 20, mb = 1, md = 10) {
+  auc <- c()
+  for (s in semillas) {
+    set.seed(s)
+    in_training <- caret::createDataPartition(ds$clase_binaria, p = 0.70,
+                                              list = FALSE)
+    train  <-  ds[in_training, ]
+    test   <-  ds[-in_training, ]
+    #train_sample <- tomar_muestra(train)
+    r <- modelo_rpart(train, test, 
+                      cp = cp, ms = ms, mb = mb, md = md)
+    ganancia <- c(ganancia, r)
+  }
+  mean(ganancia)
 }
 
 # Haremos 25 experimentos aleatorios, armamos las muestras de acuerdo a como
@@ -309,7 +330,7 @@ for (v in 4:20) {
 ggplot(resultados_maxdepth, aes(md, auc)) + geom_point()
 
 ## ---------------------------
-## Step 9: Buscando con una Opt. Bayesiana para 1 parámetro
+## Step 9bis: Buscando con una Opt. Bayesiana para 1 parámetro
 ## ---------------------------
 
 set.seed(semillas[1])
@@ -383,6 +404,50 @@ surr_km <- makeLearner("regr.km", predict.type = "se", covtype = "matern3_2")
 
 run_md_ms <- mbo(obj_fun, learner = surr_km, control = ctrl, )
 print(run_md_ms)
+
+
+## ---------------------------
+## Step 11: Buscando con una Opt. Bayesiana para 2 parámetros
+## ---------------------------
+
+set.seed(semillas[1])
+obj_fun_md_ms <- function(x) {
+  experimento_rpart_sin_muestreo(dataset, semillas
+                    , md = x$maxdepth
+                    , ms = x$minsplit
+                    , mb = floor(x$minsplit * x$minbucket_multiplier))
+}
+
+obj_fun <- makeSingleObjectiveFunction(
+  minimize = FALSE,
+  fn = obj_fun_md_ms,
+  par.set = makeParamSet(
+    makeIntegerParam("maxdepth",  lower = 4L, upper = 20L),
+    makeIntegerParam("minsplit",  lower = 1L, upper = 200L),
+    makeNumericParam("minbucket_multiplier",  lower = 0, upper = 1)
+    # makeNumericParam <- para parámetros continuos
+  ),
+  # noisy = TRUE,
+  has.simple.signature = FALSE
+)
+
+ctrl <- makeMBOControl()
+ctrl <- setMBOControlTermination(ctrl, iters = 32L)
+ctrl <- setMBOControlInfill(
+  ctrl,
+  crit = makeMBOInfillCritEI(),
+  opt = "focussearch",
+  # sacar parámetro opt.focussearch.points en próximas ejecuciones
+  opt.focussearch.points = 20
+)
+
+lrn <- makeMBOLearner(ctrl, obj_fun)
+
+surr_km <- makeLearner("regr.km", predict.type = "se", covtype = "matern3_2")
+
+run_md_ms <- mbo(obj_fun, learner = surr_km, control = ctrl, )
+print(run_md_ms)
+
 
 ## TAREA:
 ## Agregue todos los parámetros que considere. Una vez que tenga sus mejores
