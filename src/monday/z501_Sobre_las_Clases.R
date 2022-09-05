@@ -21,9 +21,9 @@ require("treeClust")
 require("ggplot2")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd("/home/santiago/Documents/Maestría/EyF/")
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(66607,66637, 66647,66667,66697)
 
 # Cargamos el dataset
 dataset <- fread("./datasets/competencia1_2022.csv")
@@ -281,3 +281,4 @@ for (s in semillas) {
 ## - ¿Qué estrategia piensa que puede ser útil para elegir el punto de corte?
 ## - ¿Para la búsqueda del mejor modelo que valor va a usar para la OB?
 ## - ¿Pros y contras de elegir los N mejores casos?
+
