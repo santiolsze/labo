@@ -18,12 +18,12 @@ require("rpart")
 require("ggplot2")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd("/home/santiago/Documents/Maestría/EyF/")
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(66607,66637,66647,66667,66697)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
-dataset <- fread("./datasets/competencia2_2022.csv.gz")
+dataset <- fread("./datasets/competencia2_2022.csv")
 enero <- dataset[foto_mes == 202101]
 marzo <- dataset[foto_mes == 202103]
 
@@ -62,7 +62,7 @@ marzo[, sum(ifelse(pred > 0.025,
 ## ---------------------------
 
 leaderboad <- data.table()
-set.seed(semillas[1])
+set.seed(semillas[2])
 for (i in 1:100) {
   split <- caret::createDataPartition(marzo$clase_ternaria,
                      p = 0.70, list = FALSE)
@@ -122,6 +122,7 @@ marzo[, sum(ifelse(pred2 >= 0.025,
 ## Step 6: Compitiendo entre dos modelos, ahora en los leaderboards
 ## ---------------------------
 
+
 leaderboad2 <- data.table()
 set.seed(semillas[1])
 for (i in 1:100) {
@@ -145,9 +146,10 @@ for (i in 1:100) {
                            publico2 = publico2)))
 }
 
-leaderboad2
+leaderboad2[,ganador_por_publico:= ifelse(publico2>publico,"2","1")]
+leaderboad2[,ganador_real_privado:= ifelse(privado2>privado,"2","1")]
 
-
+leaderboad2[,.N,list(ganador_por_publico, ganador_real_privado)]
 ## Preguntas
 ## Viendo la tabla anterior, ¿En cuántos leaderboard hubiera elegido el modelo
 ## correcto usando el público?

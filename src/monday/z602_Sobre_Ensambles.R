@@ -47,12 +47,12 @@ require("randomForest")
 require("lightgbm")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd("/home/santiago/Documents/Maestría/EyF/")
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(66607,66637,66647,66667,66697)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
-dataset <- fread("./datasets/competencia2_2022.csv.gz")
+dataset <- fread("./datasets/competencia2_2022.csv")
 enero <- dataset[foto_mes == 202101]
 marzo <- dataset[foto_mes == 202103]
 
@@ -81,7 +81,7 @@ modelo_rf_1 <- ranger(clase_binaria1 ~ ., data = dtrain,
                   probability = TRUE,
                   num.trees = 100,
                   min.node.size=10,
-                  mtry = n_variables,
+                  mtry = n_variables, # Este es el parámetro más importante
                   splitrule = "gini",
                   sample.fraction = 0.66,
                   importance = "impurity",
@@ -117,7 +117,7 @@ importancia <- as.data.table(modelo_rf_1$variable.importance,
                     keep.rownames = TRUE)
 colnames(importancia) <- c("variable", "importancia")
 setorder(importancia, -importancia)
-importancia
+head(importancia,10)
 
 ## Preguntas
 ## - ¿Qué significa que una variable sea más importante que otra?
@@ -273,3 +273,4 @@ for (i in 1:100) {
 summary(leaderboad)
 
 ## Bienvenido al mundo de los ensambles
+
