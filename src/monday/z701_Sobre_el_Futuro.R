@@ -23,12 +23,12 @@ require("ggplot2")
 require("lightgbm")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd("/home/santiago/Documents/Maestría/EyF/")
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(66607, 66637, 66647, 66667, 66697)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
-dataset <- fread("./datasets/competencia2_2022.csv.gz")
+dataset <- fread("./datasets/competencia2_2022.csv")
 enero <- dataset[foto_mes == 202101]
 marzo <- dataset[foto_mes == 202103]
 
@@ -74,6 +74,7 @@ length(unique(marzo$pred))
 ## ---------------------------
 
 # Simulamos un Leaderboard público:
+
 set.seed(semillas)
 split <- caret::createDataPartition(marzo$clase_ternaria, p = 0.50, list = FALSE)
 
@@ -98,10 +99,11 @@ sum((marzo$pred[-split] > 0.025) * ifelse(marzo$clase_ternaria[-split] == "BAJA+
 setorder(marzo, cols = -pred)
 
 # PROBAR MULTIPLES VALORES
-set.seed(semillas[3])
-m <- 500
+
+set.seed(semillas[4])
+m <- 1000
 f <- 2000
-t <- 12000
+t <- 25000
 
 leaderboad <- data.table()
 split <- caret::createDataPartition(marzo$clase_ternaria, p = 0.50, list = FALSE)
@@ -118,6 +120,8 @@ for (s in seq(f, t, m)) {
                         ))
 }
 # Graficamos
+#dev.off()
+
 ggplot(leaderboad, aes(x = envio, y = valor, color = board)) + geom_line()
 
 ## ACTIVE LEARNING: Juegue con los parámetros y busque si hay alguna información

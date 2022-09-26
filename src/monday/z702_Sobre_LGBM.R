@@ -20,12 +20,12 @@ require("ggplot2")
 require("lightgbm")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd("/home/santiago/Documents/Maestría/EyF/")
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(66607, 66637, 66647, 66667, 66697)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
-dataset <- fread("./datasets/competencia2_2022.csv.gz")
+dataset <- fread("./datasets/competencia2_2022.csv")
 marzo <- dataset[foto_mes == 202103]
 rm(dataset)
 

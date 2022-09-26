@@ -38,14 +38,50 @@ graficar_campo  <- function( campo, campo_clase, valores_clase )
            col=c("blue", "red"), lty=c(1,2))
 
 }
+
+graficar_campo2  <- function( campo, campo_clase, valores_clase )
+{
+  
+  #quito de grafico las colas del 5% de las densidades
+  qA  <- quantile(  dataset[ foto_mes==202101 , get(campo) ] , prob= c(0.05, 0.95), na.rm=TRUE )
+  qB  <- quantile(  dataset[ foto_mes==202103 , get(campo) ] , prob= c(0.05, 0.95), na.rm=TRUE )
+  qc  <- quantile(  dataset[ foto_mes==202105 , get(campo) ] , prob= c(0.05, 0.95), na.rm=TRUE )
+  
+  xxmin  <- pmin( qA[[1]], qB[[1]] )
+  xxmax  <- pmax( qA[[2]], qB[[2]] )
+  
+  densidad_A  <- density( dataset[ foto_mes==202101,get(campo)],
+                          kernel="gaussian", na.rm=TRUE )
+  
+  densidad_B  <- density( dataset[ foto_mes==202103,get(campo)],
+                          kernel="gaussian", na.rm=TRUE )
+  densidad_C  <- density( dataset[ foto_mes==202105,get(campo)],
+                          kernel="gaussian", na.rm=TRUE )
+  
+  
+  plot( densidad_A,
+        col="blue",
+        xlim= c( xxmin, xxmax ),
+        ylim= c( 0, pmax( max(densidad_A$y), max(densidad_B$y) ) ),
+        main= paste0( campo) 
+  )
+  
+  lines(densidad_B, col="red", lty=2)
+  lines(densidad_C, col="darkgreen", lty=2)
+  
+  legend(  "topright",  
+           legend=c("202001", "202003","202005"),
+           col=c("blue", "red","darkgreen"), lty=c(1,2,3))
+  
+}
 #------------------------------------------------------------------------------
 #Aqui comienza el programa
-setwd("~/buckets/b1")
-
+#setwd("~/buckets/b1")
+setwd("/home/santiago/Documents/Maestría/EyF/")
 #cargo el dataset donde voy a entrenar
-dataset  <- fread("./datasets/competencia2_2022.csv.gz")
+dataset  <- fread("datasets/competencia2_2022.csv")
 
-dataset  <- dataset[  foto_mes %in% c( 202101, 202103 ) ]
+dataset  <- dataset[  foto_mes %in% c( 202101, 202103,202105 ) ]
 
 #creo la clase_binaria SI={ BAJA+1, BAJA+2 }    NO={ CONTINUA }
 dataset[ foto_mes==202101, 
@@ -79,11 +115,11 @@ for( campo in  campos_buenos )
 {
   cat( campo, "  " )
   
-  graficar_campo( campo, "clase_ternaria", c( "BAJA+1", "BAJA+2", "CONTINUA" ) )
-  graficar_campo( campo, "clase_ternaria", c( "BAJA+1", "BAJA+2" ) )
-  graficar_campo( campo, "clase_ternaria", c( "BAJA+2" ) )
-  graficar_campo( campo, "clase_ternaria", c( "BAJA+1" ) )
-  graficar_campo( campo, "clase_ternaria", c( "CONTINUA" ) )
+  graficar_campo2( campo, "clase_ternaria", c( "BAJA+1", "BAJA+2", "CONTINUA" ) )
+  #graficar_campo( campo, "clase_ternaria", c( "BAJA+1", "BAJA+2" ) )
+  #graficar_campo( campo, "clase_ternaria", c( "BAJA+2" ) )
+  #graficar_campo( campo, "clase_ternaria", c( "BAJA+1" ) )
+  #graficar_campo( campo, "clase_ternaria", c( "CONTINUA" ) )
 }
 
 dev.off()
