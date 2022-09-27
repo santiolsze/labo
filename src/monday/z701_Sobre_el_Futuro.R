@@ -120,7 +120,11 @@ for (s in seq(f, t, m)) {
                         ))
 }
 # Graficamos
+<<<<<<< HEAD
 #dev.off()
+=======
+ggplot(leaderboad[board == "publico"], aes(x = envio, y = valor, color = board)) + geom_line()
+>>>>>>> upstream/main
 
 ggplot(leaderboad, aes(x = envio, y = valor, color = board)) + geom_line()
 
