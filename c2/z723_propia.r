@@ -36,8 +36,7 @@ hs <- makeParamSet(
          makeNumericParam("feature_fraction", lower=    0.2  , upper=    1.0),
          makeIntegerParam("min_data_in_leaf", lower=    100L   , upper=  8000L),
          makeIntegerParam("num_leaves",       lower=   16L   , upper=  1024L),
-         makeIntegerParam("envios",           lower= 5000L   , upper= 15000L),
-         makeIntegerParam("max_bin",       lower=   0L   , upper=  31L)
+         makeIntegerParam("envios",           lower= 5000L   , upper= 15000L)
         )
 
 #defino los parametros de la corrida, en una lista, la variable global  PARAM
@@ -129,6 +128,7 @@ EstimarGanancia_lightgbm  <- function( x )
                           min_gain_to_split= 0.0, #por ahora, lo dejo fijo
                           lambda_l1= 0.0,         #por ahora, lo dejo fijo
                           lambda_l2= 0.0,         #por ahora, lo dejo fijo
+                          max_bin = 31,
                           num_iterations= 9999,   #un numero muy grande, lo limita early_stopping_rounds
                           force_row_wise= TRUE,   #para que los alumnos no se atemoricen con tantos warning
                           seed= PARAM$hyperparametertuning$semilla_azar
