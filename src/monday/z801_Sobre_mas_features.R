@@ -19,12 +19,21 @@ require("lightgbm")
 require("xgboost")
 
 # Poner la carpeta de la materia de SU computadora local
+<<<<<<< HEAD
 setwd("/home/santiago/Documents/Maestría/EyF/")
 # Poner sus semillas
 semillas <- c(66607, 66637, 6660747, 66667, 66697)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
 dataset <- fread("./datasets/competencia2_2022.csv")
+=======
+setwd("/home/aleb/dmeyf2022")
+# Poner sus semillas
+semillas <- c(17, 19, 23, 29, 31)
+
+# Cargamos los datasets y nos quedamos solo con 202101 y 202103
+dataset <- fread("./datasets/competencia2_2022.csv.gz")
+>>>>>>> a7965dca2aa54fd15287a2f7be81fd826c2dbf68
 marzo <- dataset[foto_mes == 202103]
 mayo <- dataset[foto_mes == 202105]
 rm(dataset)
@@ -65,7 +74,12 @@ colnames(new_features)[150:173]
 ## Step 4: Entendiendo como se construyen.
 ## ---------------------------
 
+<<<<<<< HEAD
 xgb.plot.tree(colnames(new_features), xgb_model, trees = a)  
+=======
+xgb.plot.tree(colnames(new_features), xgb_model, trees = 0)
+
+>>>>>>> a7965dca2aa54fd15287a2f7be81fd826c2dbf68
 
 ## ---------------------------
 ## Step 5: Viendo cuán importantes son las nuevas variables, pero con un LGBM!!!
