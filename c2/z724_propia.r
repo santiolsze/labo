@@ -23,12 +23,12 @@ PARAM$input$training      <- c( 202103 )
 PARAM$input$future        <- c( 202105 )
 
 PARAM$finalmodel$max_bin           <-     31
-PARAM$finalmodel$learning_rate     <-      0.0280015981   #0.0142501265
-PARAM$finalmodel$num_iterations    <-    328  #615
-PARAM$finalmodel$num_leaves        <-   1015  #784
-PARAM$finalmodel$min_data_in_leaf  <-   5542  #5628
-PARAM$finalmodel$feature_fraction  <-      0.7832319551  #0.8382482539
-PARAM$finalmodel$semilla           <- 102191
+PARAM$finalmodel$learning_rate     <-      0.009528322238   #0.0142501265
+PARAM$finalmodel$num_iterations    <-    367  #615
+PARAM$finalmodel$num_leaves        <-   786  #784
+PARAM$finalmodel$min_data_in_leaf  <-   100  #5628
+PARAM$finalmodel$feature_fraction  <-      0.6082392485  #0.8382482539
+PARAM$finalmodel$semilla           <- 66667
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -45,6 +45,34 @@ dataset  <- fread(PARAM$input$dataset, stringsAsFactors= TRUE)
 #set trabaja con la clase  POS = { BAJA+1, BAJA+2 } 
 #esta estrategia es MUY importante
 dataset[ , clase01 := ifelse( clase_ternaria %in%  c("BAJA+2","BAJA+1"), 1L, 0L) ]
+
+
+sufijos_visa_master <- c(  "_delinquency",  "_mfinanciacion_limite",
+                           "_msaldototal",  "_msaldopesos",  "_msaldodolares",
+                           "_mconsumospesos",  "_mconsumosdolares","_mlimitecompra",
+                           "_madelantopesos",  "_madelantodolares")
+
+# Creo los campos suma de visa y master
+for (suf in sufijos_visa_master){
+  n_visa = paste0("Visa",suf)
+  n_master = paste0("Master",suf)
+  n_nuevo = paste0("Visa_plus_Master",suf)
+  dataset <- dataset[,(n_nuevo) := ifelse(is.na(get(n_visa)),0,get(n_visa)) + 
+                       ifelse(is.na(get(n_master)),0,get(n_master))]}
+
+# Hay otros campos que no son sufijos, pero también son sumables.
+dataset[,c_tarjeta_visa_master := ctarjeta_visa+ctarjeta_master]
+dataset[,c_tarjeta_visa_master_transacciones := ctarjeta_visa_transacciones+ctarjeta_master_transacciones]
+dataset[,m_tarjeta_visa_master_consumo := mtarjeta_visa_consumo+mtarjeta_master_consumo]
+
+
+# Creo campos consumo / limite como medida de actividad
+dataset[,"Visa_mconsumospesos_sobre_mlimitecompra":=Visa_mconsumospesos / Visa_mlimitecompra]
+dataset[,"Master_mconsumospesos_sobre_mlimitecompra":=Master_mconsumospesos / Master_mlimitecompra]
+# antiguedad sobre edad (proporción de su vida como cliente de banco)
+dataset[,"antiguedad_proporcion_edad":=(cliente_antiguedad/12) / cliente_edad]
+
+
 
 #--------------------------------------
 
