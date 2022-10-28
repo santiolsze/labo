@@ -17,9 +17,9 @@ require("data.table")
 PARAM  <- list()
 PARAM$exp_input  <- "FE9250"
 
-PARAM$future       <- c( 202105)
-PARAM$final_train  <- c(202008,202009,202010,202011,202012,202101,202102,202103) # Tengo mis dudas, porque no vamos a poder validar nada.
-PARAM$train$training     <- c(202008,202009,202010,202011,202012,202101,202102,202103) 
+PARAM$future       <- c( 202107)
+PARAM$final_train  <- c(202005,202006,202007,202008,202009,202010,202011,202012,202101,202102,202103,202104,202105) # Tengo mis dudas, porque no vamos a poder validar nada.
+PARAM$train$training     <- c(202005,202006,202007,202008,202009,202010,202011,202012,202101,202102,202103) 
 PARAM$train$validation   <- c( 202104)
 PARAM$train$testing      <- c( 202105)
 
@@ -31,7 +31,7 @@ PARAM$train$semilla_sampling  <- 102191
 PARAM$train$semilla_under     <- 892237
 
 
-PARAM$experimento <- "TS9320_M08_US15_ST100"
+PARAM$experimento <- "TS9320_M11_US15_ST100"
 # FIN Parametros del script
 
 
