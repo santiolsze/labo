@@ -14,9 +14,9 @@ require("data.table")
 
 #Parametros del script
 PARAM  <- list()
-PARAM$experimento  <- "DR9141"
+PARAM$experimento  <- "DR401"
 
-PARAM$exp_input  <- "CA9060"
+PARAM$exp_input  <- "CA401"
 
 #valores posibles  "ninguno" "rank_simple" , "rank_cero_fijo" , "deflacion"
 PARAM$metodo  <- "deflacion"
@@ -196,8 +196,9 @@ setwd("~/buckets/b1")
 #cargo el dataset donde voy a entrenar
 #esta en la carpeta del exp_input y siempre se llama  dataset.csv.gz
 dataset_input  <- paste0( "./exp/", PARAM$exp_input, "/dataset.csv.gz" )
+print("Leyendo dataset")
 dataset  <- fread( dataset_input )
-
+print("Dataset leido")
 #creo la carpeta donde va el experimento
 dir.create( paste0( "./exp/", PARAM$experimento, "/"), showWarnings = FALSE )
 setwd(paste0( "./exp/", PARAM$experimento, "/"))   #Establezco el Working Directory DEL EXPERIMENTO
@@ -205,17 +206,20 @@ setwd(paste0( "./exp/", PARAM$experimento, "/"))   #Establezco el Working Direct
 
 
 #primero agrego las variables manuales
+print("Agregando variables")
 AgregarVariables( dataset )
-
+print("Variables agregadas")
 #ordeno de esta forma por el ranking
+print("Ordenando dataset ")
 setorder( dataset, foto_mes, numero_de_cliente )
-
+print("Dataset ordenado")
 #por como armé los nombres de campos, estos son los campos que expresan variables monetarias
 campos_monetarios  <- colnames(dataset)
 campos_monetarios  <- campos_monetarios[campos_monetarios %like% "^(m|Visa_m|Master_m|vm_m)"]
 
 #aqui aplico un metodo para atacar el data drifting
 #hay que probar experimentalmente cual funciona mejor
+print("Corrigiendo el drifting")
 switch( 
 PARAM$metodo,
   "ninguno"        = cat( "No hay correccion del data drifting" ),
@@ -223,7 +227,7 @@ PARAM$metodo,
   "rank_cero_fijo" = drift_rank_cero_fijo( campos_monetarios ),
   "deflacion"      = drift_deflacion( campos_monetarios ) 
 )
-
+print("Drifting corregido")
 
 
 fwrite( dataset,
