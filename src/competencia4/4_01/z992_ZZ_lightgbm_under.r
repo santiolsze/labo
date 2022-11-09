@@ -68,7 +68,7 @@ campos_buenos  <- setdiff( colnames(dataset), c( "clase_ternaria", "clase01") )
 #genero un modelo para cada uno de las modelos_qty MEJORES iteraciones de la Bayesian Optimization
 for( i in  1:PARAM$modelos )
 {
-  print("Iniciando entrenamiento de primer modelo: creando dataset de train y parametrizando")
+  print("Iniciando entrenamiento de primer modelo: creando dataset de train y parametrizando") #cambiar este print, es del "i" modelo.
   parametros  <- as.list( copy( tb_log[ i ] ) )
   iteracion_bayesiana  <- parametros$iteracion_bayesiana
 
