@@ -15,14 +15,13 @@ require("lightgbm")
 
 #Parametros del script
 PARAM  <- list()
-PARAM$experimento  <- "ZZ9420"
-PARAM$exp_input  <- "HT9420"
+PARAM$experimento  <- "ZZ401"
+PARAM$exp_input  <- "HT401"
 
 PARAM$modelos  <- 2
 # FIN Parametros del script
 
-ksemilla  <- 102191
-
+ksemillas <- c(3, 5, 7, 11, 13, 17, 19, 23, 31, 43, 61, 79, 101, 127, 167, 191, 199, 313, 347, 701, 1709, 2617, 3539, 5807, 10501, 10691, 11279, 12391, 14479, 42737, 83339, 95369, 117239, 127031, 138937, 141079, 267017, 269987, 374321)
 #------------------------------------------------------------------------------
 options(error = function() { 
   traceback(20); 
@@ -36,6 +35,7 @@ options(error = function() {
 base_dir <- "~/buckets/b1/"
 
 #creo la carpeta donde va el experimento
+print("Leyendo log")
 dir.create( paste0( base_dir, "exp/", PARAM$experimento, "/"), showWarnings = FALSE )
 setwd(paste0( base_dir, "exp/", PARAM$experimento, "/"))   #Establezco el Working Directory DEL EXPERIMENTO
 
@@ -45,10 +45,12 @@ tb_log  <- fread( arch_log )
 setorder( tb_log, -ganancia )
 
 #leo el nombre del expermento de la Training Strategy
+print("Leyendo TrainingStrategy")
 arch_TS  <- paste0( base_dir, "exp/", PARAM$exp_input, "/TrainingStrategy.txt" )
 TS  <- readLines( arch_TS, warn=FALSE )
 
 #leo el dataset donde voy a entrenar el modelo final
+print("Leyendo datasets")
 arch_dataset  <- paste0( base_dir, "exp/", TS, "/dataset_train_final.csv.gz" )
 dataset  <- fread( arch_dataset )
 
@@ -66,6 +68,7 @@ campos_buenos  <- setdiff( colnames(dataset), c( "clase_ternaria", "clase01") )
 #genero un modelo para cada uno de las modelos_qty MEJORES iteraciones de la Bayesian Optimization
 for( i in  1:PARAM$modelos )
 {
+  print("Iniciando entrenamiento de primer modelo: creando dataset de train y parametrizando")
   parametros  <- as.list( copy( tb_log[ i ] ) )
   iteracion_bayesiana  <- parametros$iteracion_bayesiana
 
@@ -108,7 +111,14 @@ for( i in  1:PARAM$modelos )
   parametros$leaf_size_log  <- NULL
   parametros$coverage  <- NULL
 
+
+  # Voy a loopear por varias semillas a partir de acá:
+  for( ksemilla in  ksemillas)
+{
+
   #Utilizo la semilla definida en este script
+    print(paste("Iniciando entrenamiento para semilla:",ksemilla))
+
   parametros$seed  <- ksemilla
   
   #genero el modelo entrenando en los datos finales
@@ -128,6 +138,8 @@ for( i in  1:PARAM$modelos )
                         sprintf( "%02d", i ),
                         "_",
                         sprintf( "%03d", iteracion_bayesiana ),
+                        "_seed",
+                        sprintf(ksemilla),
                         ".txt" ),
           sep= "\t" )
 
@@ -139,11 +151,13 @@ for( i in  1:PARAM$modelos )
   tb_prediccion  <- dfuture[  , list( numero_de_cliente, foto_mes ) ]
   tb_prediccion[ , prob := prediccion ]
 
-
+  print("Guardando predicciones")
   nom_pred  <- paste0( "pred_",
                        sprintf( "%02d", i ),
                        "_",
                        sprintf( "%03d", iteracion_bayesiana),
+                        "_seed",
+                        sprintf(ksemilla),
                        ".csv"  )
 
   fwrite( tb_prediccion,
@@ -171,6 +185,8 @@ for( i in  1:PARAM$modelos )
                            sprintf( "%03d", iteracion_bayesiana ),
                            "_",
                            sprintf( "%05d", corte ),
+                           "_seed",
+                           sprintf(ksemilla),
                            ".csv" )
 
     fwrite(  tb_prediccion[ , list( numero_de_cliente, Predicted ) ],
@@ -178,12 +194,13 @@ for( i in  1:PARAM$modelos )
              sep= "," )
 
   }
-
-
-  #borro y limpio la memoria para la vuelta siguiente del for
+  # Borro las cosas que se deben crear en cada for de semillas
   rm( tb_prediccion )
   rm( tb_importancia )
   rm( modelo_final)
+
+}
+  #borro y limpio la memoria para la vuelta siguiente del for de modelos
   rm( parametros )
   rm( dtrain )
   gc()
