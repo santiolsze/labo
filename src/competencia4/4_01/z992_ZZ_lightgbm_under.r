@@ -139,7 +139,7 @@ for( i in  1:PARAM$modelos )
                         "_",
                         sprintf( "%03d", iteracion_bayesiana ),
                         "_seed",
-                        sprintf(ksemilla),
+                        sprintf(as.character(ksemilla)),
                         ".txt" ),
           sep= "\t" )
 
@@ -157,7 +157,7 @@ for( i in  1:PARAM$modelos )
                        "_",
                        sprintf( "%03d", iteracion_bayesiana),
                         "_seed",
-                        sprintf(ksemilla),
+                        sprintf(as.character(ksemilla)),
                        ".csv"  )
 
   fwrite( tb_prediccion,
@@ -186,7 +186,7 @@ for( i in  1:PARAM$modelos )
                            "_",
                            sprintf( "%05d", corte ),
                            "_seed",
-                           sprintf(ksemilla),
+                           sprintf(as.character(ksemilla)),
                            ".csv" )
 
     fwrite(  tb_prediccion[ , list( numero_de_cliente, Predicted ) ],
